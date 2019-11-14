@@ -5,6 +5,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -38,14 +39,12 @@ public class IndexManagerTest {
             //文件大小
             Long fileSize = FileUtils.sizeOf(file);
 
-
             //创建文档对象
             Document document = new Document();
-
             //创建域
             TextField nameField = new TextField("fileName", fileName, Field.Store.YES);
             TextField contextField = new TextField("fileContext", fileContext, Field.Store.YES);
-            TextField sizeField = new TextField("fileSize", fileSize.toString(), Field.Store.YES);
+            LongField sizeField = new LongField("fileSize", fileSize, Field.Store.YES);
 
             //将创建的所有域都存入文档中
             document.add(nameField);
@@ -89,7 +88,7 @@ public class IndexManagerTest {
         Analyzer analyzer = new StandardAnalyzer();
 
         //指定索引库的位置
-        Directory directory = FSDirectory.open(new File("E:\\src\\git\\lucene_demo\\index"));
+        Directory directory = FSDirectory.open(new File("E:\\git\\lucene_demo\\index"));
         //创建写对象的初始化配置
         IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_3, analyzer);
         //创建写对象
@@ -105,5 +104,37 @@ public class IndexManagerTest {
         indexWriter.commit();
         indexWriter.close();
 
+    }
+
+    /**
+     * 测试更新索引
+     */
+    @Test
+    public void testIndexUpdate() throws Exception {
+        //创建分词器，StandardAnalyzer为标准分词器，中文单字分词
+        Analyzer analyzer = new StandardAnalyzer();
+
+        //指定索引库的位置
+        Directory directory = FSDirectory.open(new File("E:\\git\\lucene_demo\\index"));
+        //创建写对象的初始化配置
+        IndexWriterConfig writerConfig = new IndexWriterConfig(Version.LUCENE_4_10_3, analyzer);
+        //创建写对象
+        IndexWriter indexWriter = new IndexWriter(directory, writerConfig);
+
+
+        //更新条件
+        Term term = new Term("fileName", "demo.txt");
+        //新的文档
+        Document document = new Document();
+        document.add(new TextField("fileName","newFile", Field.Store.YES));
+        document.add(new TextField("fileContext","hello new file", Field.Store.YES));
+        document.add(new LongField("fileSize",10L, Field.Store.YES));
+        //更新文档：按照传入的Term进行搜索，找到结果那么删除,将更新的内容重新生成一个Document对象，没有搜索到结果直接添加新的document
+        indexWriter.updateDocument(term,document);
+
+        //提交
+        indexWriter.commit();
+        //关闭
+        indexWriter.close();
     }
 }
