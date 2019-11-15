@@ -65,8 +65,8 @@ public class IndexSearchTest {
 
     /**
      * 多条件查询
-     * BooleanClause.Occur.MUST 相当于and
-     * BooleanClause.Occur.MUST_NOT 相当于not
+     * BooleanClause.Occur.MUST 相当于 and
+     * BooleanClause.Occur.MUST_NOT 相当于 not
      * BooleanClause.Occur.SHOULD 相当于 or
      * @throws Exception
      */

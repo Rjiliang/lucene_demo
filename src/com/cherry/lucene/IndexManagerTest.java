@@ -70,7 +70,7 @@ public class IndexManagerTest {
             indexWriter.addDocument(document);
         }
 
-        //提交
+        //提交写入索引库
         indexWriter.commit();
 
         //关闭流
